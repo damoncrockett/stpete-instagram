@@ -12,7 +12,7 @@ coll = db.sample_tweets_collection
 
 DIR = "/data/damoncrockett/stpete/tweets/"
 
-tmp = pd.read_csv(DIR+"spb_ids.csv")
+tmp = pd.read_csv(DIR+str(year)+".csv")
 ids = list(tmp.mongo_id)
 ids = [ObjectId(item) for item in ids]
 
@@ -25,7 +25,8 @@ projection = {'_id' : 1,
               'body' : 1,
               'twitter_entities.media.media_url': 1,
               'geo.coordinates': 1,
-              'postedTime': 1
+              'postedTime': 1,
+              'actor.id': 1
               }
 
 cur = coll.find(query,projection)
@@ -39,7 +40,7 @@ lat = [item['geo']['coordinates'][0] for item in metadata]
 lon = [item['geo']['coordinates'][1] for item in metadata]
 dl_url = [item['twitter_entities']['media'][0]['media_url'] for item in metadata]
 postedTime = [item['postedTime'] for item in metadata]
-
+actor_id = [item['actor']['id'] for item in metadata]
 
 df = pd.DataFrame(mongo_id,columns=['mongo_id'])
 df['text'] = text
@@ -47,5 +48,6 @@ df['lat'] = lat
 df['lon'] = lon
 df['dl_url'] = dl_url
 df['postedTime'] = postedTime
+df['actor_id'] = actor_id
 
-df.to_csv(DIR + str(year) + ".csv", index=False)
+df.to_csv(DIR + str(year) + "_rich.csv", index=False)
